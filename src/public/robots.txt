@@ -1,0 +1,34 @@
+# Wassel Robots.txt
+# https://www.robotstxt.org/robotstxt.html
+
+User-agent: *
+Allow: /
+
+# Disallow admin pages
+Disallow: /admin/
+Disallow: /admin-dashboard/
+
+# Disallow user-specific pages
+Disallow: /my-trips/
+Disallow: /payments/
+Disallow: /messages/
+Disallow: /settings/
+
+# Disallow API endpoints
+Disallow: /api/
+
+# Disallow authentication pages
+Disallow: /login/
+Disallow: /signup/
+Disallow: /reset-password/
+
+# Allow public pages
+Allow: /
+Allow: /about
+Allow: /terms-of-service
+Allow: /privacy-policy
+Allow: /help
+Allow: /faq
+
+# Sitemap
+Sitemap: https://wassel.com/sitemap.xml
