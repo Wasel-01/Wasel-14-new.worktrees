@@ -17,13 +17,13 @@ export function MyTrips() {
   const { user } = useAuth();
   const [selectedTripForTracking, setSelectedTripForTracking] = useState<any>(null);
   const [trackingDialogOpen, setTrackingDialogOpen] = useState(false);
-  
+
   // Fetch user's bookings (as passenger)
   const { bookings: userBookings, loading: bookingsLoading } = useBookings();
-  
+
   // Fetch user's trips (as driver)
   const { trips: driverTrips, loading: tripsLoading } = useTrips({ driverId: user?.id });
-  
+
   // Combine and format data
   const [upcomingTripsData, setUpcomingTripsData] = useState<any[]>([]);
   const [driverTripsData, setDriverTripsData] = useState<any[]>([]);
@@ -54,7 +54,7 @@ export function MyTrips() {
     // Format driver trips
     const trips = (driverTrips || [])
       .filter((t: any) => t.status === 'published' || t.status === 'in_progress');
-    
+
     const formatted = trips.map((trip: any) => {
       // Get bookings for this trip from userBookings
       const tripBookings = (userBookings || []).filter((b: any) => b.trip_id === trip.id);
@@ -63,7 +63,7 @@ export function MyTrips() {
         initials: (b.passenger_name || 'P').split(' ').map((n: string) => n[0]).join(''),
         seats: b.seats_requested || 1,
       }));
-      
+
       return {
         id: trip.id,
         type: trip.trip_type || 'wasel',
@@ -78,7 +78,7 @@ export function MyTrips() {
         passengers,
       };
     });
-    
+
     setDriverTripsData(formatted);
 
     // Format completed trips
@@ -131,77 +131,77 @@ export function MyTrips() {
               </CardContent>
             </Card>
           ) : (
-          upcomingTripsData.map((trip) => (
-            <Card key={trip.id}>
-              <CardContent className="p-6">
-                <div className="flex flex-col lg:flex-row gap-6">
-                  {/* Trip Info */}
-                  <div className="flex-1 space-y-4">
-                    <div className="flex items-center gap-2">
-                      <Badge variant={trip.type === 'wasel' ? 'default' : 'secondary'}>
-                        {trip.type === 'wasel' ? 'Wasel (واصل)' : 'Raje3 (راجع)'}
-                      </Badge>
-                      <Badge variant="outline">{trip.status}</Badge>
+            upcomingTripsData.map((trip) => (
+              <Card key={trip.id}>
+                <CardContent className="p-6">
+                  <div className="flex flex-col lg:flex-row gap-6">
+                    {/* Trip Info */}
+                    <div className="flex-1 space-y-4">
+                      <div className="flex items-center gap-2">
+                        <Badge variant={trip.type === 'wasel' ? 'default' : 'secondary'}>
+                          {trip.type === 'wasel' ? 'Wasel (واصل)' : 'Raje3 (راجع)'}
+                        </Badge>
+                        <Badge variant="outline">{trip.status}</Badge>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <Locate className="w-5 h-5 text-gray-400" />
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{trip.from}</span>
+                          <MoveRight className="w-4 h-4 text-gray-400" />
+                          <span className="font-medium">{trip.to}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-6 text-sm text-gray-600">
+                        <div className="flex items-center gap-2">
+                          <CalendarDays className="w-4 h-4" />
+                          <span>{trip.date}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <UsersRound className="w-4 h-4" />
+                          <span>{trip.seats} seats booked</span>
+                        </div>
+                      </div>
+
+                      {/* Driver Info */}
+                      <div className="flex items-center gap-3 pt-3 border-t">
+                        <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                          <span className="text-sm">{trip.driver.initials}</span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">{trip.driver.name}</p>
+                          <p className="text-sm text-gray-500">{trip.driver.vehicle}</p>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                      <Locate className="w-5 h-5 text-gray-400" />
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{trip.from}</span>
-                        <MoveRight className="w-4 h-4 text-gray-400" />
-                        <span className="font-medium">{trip.to}</span>
+                    {/* Price & Actions */}
+                    <div className="flex lg:flex-col items-end justify-between lg:justify-start gap-4">
+                      <div className="text-right">
+                        <div className="text-2xl text-primary">${trip.totalPrice}</div>
+                        <p className="text-sm text-gray-500">Total price</p>
                       </div>
-                    </div>
-
-                    <div className="flex items-center gap-6 text-sm text-gray-600">
-                      <div className="flex items-center gap-2">
-                        <CalendarDays className="w-4 h-4" />
-                        <span>{trip.date}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <UsersRound className="w-4 h-4" />
-                        <span>{trip.seats} seats booked</span>
-                      </div>
-                    </div>
-
-                    {/* Driver Info */}
-                    <div className="flex items-center gap-3 pt-3 border-t">
-                      <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                        <span className="text-sm">{trip.driver.initials}</span>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">{trip.driver.name}</p>
-                        <p className="text-sm text-gray-500">{trip.driver.vehicle}</p>
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleTrackTrip(trip)}
+                          className="gap-1"
+                        >
+                          <Radar className="w-3 h-3" />
+                          Track Live
+                        </Button>
+                        <Button variant="outline" size="sm">Contact Driver</Button>
+                        <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                          Cancel
+                        </Button>
                       </div>
                     </div>
                   </div>
-
-                  {/* Price & Actions */}
-                  <div className="flex lg:flex-col items-end justify-between lg:justify-start gap-4">
-                    <div className="text-right">
-                      <div className="text-2xl text-primary">${trip.totalPrice}</div>
-                      <p className="text-sm text-gray-500">Total price</p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleTrackTrip(trip)}
-                        className="gap-1"
-                      >
-                        <Radar className="w-3 h-3" />
-                        Track Live
-                      </Button>
-                      <Button variant="outline" size="sm">Contact Driver</Button>
-                      <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))
           )}
         </TabsContent>
 
@@ -217,66 +217,66 @@ export function MyTrips() {
               </CardContent>
             </Card>
           ) : (
-          driverTripsData.map((trip) => (
-            <Card key={trip.id}>
-              <CardContent className="p-6">
-                <div className="flex flex-col lg:flex-row gap-6">
-                  <div className="flex-1 space-y-4">
-                    <div className="flex items-center gap-2">
-                      <Badge variant={trip.type === 'wasel' ? 'default' : 'secondary'}>
-                        {trip.type === 'wasel' ? 'Wasel (واصل)' : 'Raje3 (راجع)'}
-                      </Badge>
-                      <Badge variant="outline">{trip.booked}/{trip.totalSeats} seats booked</Badge>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <Locate className="w-5 h-5 text-gray-400" />
+            driverTripsData.map((trip) => (
+              <Card key={trip.id}>
+                <CardContent className="p-6">
+                  <div className="flex flex-col lg:flex-row gap-6">
+                    <div className="flex-1 space-y-4">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">{trip.from}</span>
-                        <MoveRight className="w-4 h-4 text-gray-400" />
-                        <span className="font-medium">{trip.to}</span>
+                        <Badge variant={trip.type === 'wasel' ? 'default' : 'secondary'}>
+                          {trip.type === 'wasel' ? 'Wasel (واصل)' : 'Raje3 (راجع)'}
+                        </Badge>
+                        <Badge variant="outline">{trip.booked}/{trip.totalSeats} seats booked</Badge>
                       </div>
-                    </div>
 
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <CalendarDays className="w-4 h-4" />
-                      <span>{trip.date} at {trip.time}</span>
-                    </div>
-
-                    {trip.passengers && trip.passengers.length > 0 && (
-                      <div className="pt-3 border-t">
-                        <p className="text-sm font-medium mb-2">Passengers:</p>
-                        <div className="space-y-2">
-                          {trip.passengers.map((passenger, idx) => (
-                            <div key={idx} className="flex items-center gap-2 text-sm">
-                              <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                                <span className="text-xs">{passenger.initials}</span>
-                              </div>
-                              <span>{passenger.name}</span>
-                              <span className="text-gray-500">• {passenger.seats} seat(s)</span>
-                            </div>
-                          ))}
+                      <div className="flex items-center gap-3">
+                        <Locate className="w-5 h-5 text-gray-400" />
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{trip.from}</span>
+                          <MoveRight className="w-4 h-4 text-gray-400" />
+                          <span className="font-medium">{trip.to}</span>
                         </div>
                       </div>
-                    )}
-                  </div>
 
-                  <div className="flex lg:flex-col items-end justify-between lg:justify-start gap-4">
-                    <div className="text-right">
-                      <div className="text-2xl text-primary">AED {trip.earnings}</div>
-                      <p className="text-sm text-gray-500">Est. earnings</p>
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <CalendarDays className="w-4 h-4" />
+                        <span>{trip.date} at {trip.time}</span>
+                      </div>
+
+                      {trip.passengers && trip.passengers.length > 0 && (
+                        <div className="pt-3 border-t">
+                          <p className="text-sm font-medium mb-2">Passengers:</p>
+                          <div className="space-y-2">
+                            {trip.passengers.map((passenger, idx) => (
+                              <div key={idx} className="flex items-center gap-2 text-sm">
+                                <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                                  <span className="text-xs">{passenger.initials}</span>
+                                </div>
+                                <span>{passenger.name}</span>
+                                <span className="text-gray-500">• {passenger.seats} seat(s)</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">Edit</Button>
-                      <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                        Cancel Trip
-                      </Button>
+
+                    <div className="flex lg:flex-col items-end justify-between lg:justify-start gap-4">
+                      <div className="text-right">
+                        <div className="text-2xl text-primary">AED {trip.earnings}</div>
+                        <p className="text-sm text-gray-500">Est. earnings</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm">Edit</Button>
+                        <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                          Cancel Trip
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))
           )}
         </TabsContent>
 
@@ -288,42 +288,43 @@ export function MyTrips() {
               </CardContent>
             </Card>
           ) : (
-          completedTripsData.map((trip) => (
-            <Card key={trip.id} className="opacity-75">
-              <CardContent className="p-6">
-                <div className="flex flex-col lg:flex-row gap-6">
-                  <div className="flex-1 space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                        Completed
-                      </Badge>
-                      <Badge variant={trip.type === 'wasel' ? 'default' : 'secondary'}>
-                        {trip.type === 'wasel' ? 'Wasel' : 'Raje3'}
-                      </Badge>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <Locate className="w-5 h-5 text-gray-400" />
+            completedTripsData.map((trip) => (
+              <Card key={trip.id} className="opacity-75">
+                <CardContent className="p-6">
+                  <div className="flex flex-col lg:flex-row gap-6">
+                    <div className="flex-1 space-y-3">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">{trip.from}</span>
-                        <MoveRight className="w-4 h-4 text-gray-400" />
-                        <span className="font-medium">{trip.to}</span>
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                          Completed
+                        </Badge>
+                        <Badge variant={trip.type === 'wasel' ? 'default' : 'secondary'}>
+                          {trip.type === 'wasel' ? 'Wasel' : 'Raje3'}
+                        </Badge>
                       </div>
+
+                      <div className="flex items-center gap-3">
+                        <Locate className="w-5 h-5 text-gray-400" />
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{trip.from}</span>
+                          <MoveRight className="w-4 h-4 text-gray-400" />
+                          <span className="font-medium">{trip.to}</span>
+                        </div>
+                      </div>
+
+                      <p className="text-sm text-gray-600">{trip.date}</p>
                     </div>
 
-                    <p className="text-sm text-gray-600">{trip.date}</p>
-                  </div>
-
-                  <div className="flex lg:flex-col items-end justify-between lg:justify-start gap-4">
-                    <div className="text-right">
-                      <div className="text-2xl">${trip.price}</div>
+                    <div className="flex lg:flex-col items-end justify-between lg:justify-start gap-4">
+                      <div className="text-right">
+                        <div className="text-2xl">${trip.price}</div>
+                      </div>
+                      <Button variant="outline" size="sm">Rate Driver</Button>
                     </div>
-                    <Button variant="outline" size="sm">Rate Driver</Button>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))
+          )}
         </TabsContent>
       </Tabs>
 
