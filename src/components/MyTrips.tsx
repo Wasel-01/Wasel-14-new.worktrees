@@ -247,7 +247,7 @@ export function MyTrips() {
                         <div className="pt-3 border-t">
                           <p className="text-sm font-medium mb-2">Passengers:</p>
                           <div className="space-y-2">
-                            {trip.passengers.map((passenger, idx) => (
+                            {trip.passengers.map((passenger: { name: string; initials: string; seats: number }, idx: number) => (
                               <div key={idx} className="flex items-center gap-2 text-sm">
                                 <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
                                   <span className="text-xs">{passenger.initials}</span>
